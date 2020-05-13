@@ -3,7 +3,8 @@ const uploads=require("../../utils/upload").uploads('public/uploads/heros');
 const path=require("path");
 const baseUrl=require("../../node.config").base;
 const mongoose=require("mongoose");
-const Hero=require("../../db/admin/hero")
+const Hero=require("../../db/admin/hero");
+const url=require("url")
 
 // 上传图片
 router.post('/upload', uploads.single('heroImg'), async (ctx)=>{
@@ -96,17 +97,38 @@ router.post('/add', async ctx=>{
 
 // 列表
 router.get('/list', async ctx => {
-    await Hero.find({}).populate('races').exec().then(res => {
+    let data = ctx.request.query;
+    let page_index = data.page_index ? Number(data.page_index) : 1
+    let page_size = data.page_size ? Number(data.page_size) : 10;
+    let search_name = data.name ? data.name : ''
+    let query = {
+        name: { $regex: search_name, $options: '$i'}
+    }
+    if(data['cost[]'] && data['cost[]'].length > 0) {
+        console.log(1)
+        query.cost = {
+            $in: data['cost[]']
+        }
+    }
+    if(data['races[]'] && data['races[]'].length > 0) {
+        query.races = {
+            $in: data['races[]']
+        }
+    }
+    let count=await  Hero.countDocuments({});
+    let res = await Hero.find(query).populate('races').skip((page_index - 1) * page_size).limit(page_size);
+    if(res) {
         ctx.body={
             code: 200,
-            data: res
+            data: res,
+            total: count
         }
-    }).catch(e => {
+    } else {
         ctx.body={
             code: 201,
-            message: e.toString()
+            message: '获取列表失败'
         }
-    })
+    }
 });
 
 // 删除
