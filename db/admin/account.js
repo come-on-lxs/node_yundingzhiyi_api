@@ -19,12 +19,10 @@ const AccountSchema=new Schema({
         type: String,
         required: true
     },
-    desc: {
-        type: String,
-        required: true
-    },
+    desc: String,
     roleId: {
-        type: Array
+        type: Array,
+        default: []
     },
     status: {
         type: String,
@@ -35,6 +33,8 @@ const AccountSchema=new Schema({
         type: Date,
         default: new Date()
     }
+}, {
+    versionKey: false
 });
 
 const Account=mongoose.model("Account",AccountSchema,"admin_account");

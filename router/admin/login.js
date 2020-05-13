@@ -39,7 +39,7 @@ router.post('/', async (ctx) => {
             } else {
                 ctx.body = {
                     code:202,
-                    message: '账户已禁用'
+                    message: '账户不可用'
                 }
             }
         } else {
