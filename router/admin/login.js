@@ -68,4 +68,12 @@ router.post('/', async (ctx) => {
     }
 });
 
+router.post('/out', async ctx => {
+    ctx.session.token = null
+    ctx.body = {
+        code: 200,
+        message: '退出成功'
+    }
+});
+
 module.exports=router.routes();

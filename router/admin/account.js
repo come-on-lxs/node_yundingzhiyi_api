@@ -136,7 +136,79 @@ router.post('/resetPwd', async ctx=>{
             }
         })
     }
-})
+});
+
+// 禁用/启用
+router.post('/changeStatus', async ctx => {
+    let data = ctx.request.body;
+    if(!data.id) {
+        ctx.body = {
+            code: 201,
+            message: '缺少参数: id'
+        }
+    } else if (!data.status && data.status !== '0') {
+        ctx.body = {
+            code: 201,
+            message: '缺少参数: status'
+        }
+    } else {
+        await Account.updateOne({
+            _id: mongoose.Types.ObjectId(data.id)
+        }, {
+            status: data.status
+        }).then(() => {
+            ctx.body = {
+                code: 200,
+                message: '成功'
+            }
+        }).catch(e => {
+            ctx.body = {
+                code: 203,
+                message: e.toString()
+            }
+        })
+    }
+});
+
+// 修改
+router.post('/edit', async ctx => {
+    let data = ctx.request.body;
+    if (!data.id) {
+        ctx.body = {
+            code: 201,
+            message: '缺少参数: id'
+        }
+    } else if(!data.username) {
+        ctx.body = {
+            code: 201,
+            message: '缺少参数: username'
+        }
+    } else if (!data.status && data.status !== 0) {
+        ctx.body = {
+            code: 201,
+            message: '缺少参数: status'
+        }
+    } else {
+        await Account.updateOne({
+            _id: mongoose.Types.ObjectId(data.id)
+        }, {
+            username: data.username,
+            status: data.status,
+            desc: data.desc,
+            updat_time: new Date()
+        }).then(() => {
+            ctx.body = {
+                code: 200,
+                message: '成功'
+            }
+        }).catch(e => {
+            ctx.body = {
+                code: 203,
+                message: e.toString()
+            }
+        })
+    }
+});
 
 
 module.exports=router.routes();

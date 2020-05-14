@@ -8,6 +8,7 @@ const Schema=mongoose.Schema;
  * @params {String} desc 描述
  * @params {String} roleId 角色id
  * @params {Date} create_time 创建时间
+ * @params {Date} update_time 修改时间
  * @params {String} status 状态 1-正常 0-禁用
  */
 const AccountSchema=new Schema({
@@ -30,6 +31,10 @@ const AccountSchema=new Schema({
         default: '1'
     },
     create_time: {
+        type: Date,
+        default: new Date()
+    },
+    update_time: {
         type: Date,
         default: new Date()
     }

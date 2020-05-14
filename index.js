@@ -42,54 +42,49 @@ app.use(bodyParser());
 // koa-jwt路由权限控制
 const jwtSecret=config.jwt.secret;   // 秘钥
 
-// 过滤
-app.use(koaJwt({
-    secret:jwtSecret
-}).unless({
-    path: [/\/admin\/login/,/^\/api_xcx\/login/, /\/uploads$/]
-}));
-
-
 /*
 * 统一拦截
 exp: jwt的过期时间，这个过期时间必须要大于签发时间
 iat: jwt的签发时间
 * */
 app.use(async (ctx,next)=>{
-    // 判断token
-    const token=ctx.header.authorization ;
-    if(token && token !== 'null' && token !== 'undefined'){
-        // 验证token是否和缓存一致
-        if(token!==ctx.session.token){
-            ctx.body={
-                code: 403,
-                message:"token已失效,请重新登陆"
+    let whiteUrl = ['/admin/login']
+    console.log(ctx)
+    if(whiteUrl.includes(ctx.url)) {
+        await next()
+    } else {
+        // 判断token
+        const token = ctx.header.authorization;
+        if (token && token !== 'null' && token !== 'undefined') {
+            // 验证token是否和缓存一致
+            if (token !== ctx.session.token) {
+                ctx.body = {
+                    code: 403,
+                    message: "token已失效,请重新登陆"
+                }
+                return;
             }
-            return;
-        }
-        //使用jsonwebtoken自行解析数据
-        let payload = jwt.decode(token.split(' ')[1], jwtSecret);
-        const { exp } = payload;
-        const now = Date.now();
-        // 过期
-        if(now > exp){
-            ctx.body={
-                code: 402,
-                message:"token过期，请重新登陆"
-            };
-            return;
+            //使用jsonwebtoken自行解析数据
+            let payload = jwt.decode(token.split(' ')[1], jwtSecret);
+            const {exp} = payload;
+            const now = Date.now();
+            // 过期
+            if (now > exp) {
+                ctx.body = {
+                    code: 402,
+                    message: "token过期，请重新登陆"
+                };
+                return;
+            } else {
+                await next()
+            }
+        } else {
+            ctx.body = {
+                code: 401,
+                message: "未登录"
+            }
         }
     }
-    await next().catch(err=>{
-        if(401 == err.status){
-            ctx.body={
-                code: 401,
-                message:"未登录"
-            }
-        }else{
-            throw err;
-        }
-    })
 });
 
 router.get('/', async (ctx) => {
