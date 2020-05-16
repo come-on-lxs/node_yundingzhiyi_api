@@ -48,8 +48,9 @@ exp: jwt的过期时间，这个过期时间必须要大于签发时间
 iat: jwt的签发时间
 * */
 app.use(async (ctx,next)=>{
-    let whiteUrl = ['/admin/login']
-    console.log(ctx)
+    // token验证白名单
+    let whiteUrl = ['/admin/login'];
+    // 在白名单内的不需要验证
     if(whiteUrl.includes(ctx.url)) {
         await next()
     } else {

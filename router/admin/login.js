@@ -45,7 +45,7 @@ router.post('/', async (ctx) => {
         } else {
             ctx.body = {
                 code:202,
-                message: '账户不存在'
+                message: '账户或密码错误'
             }
         }
     }else {

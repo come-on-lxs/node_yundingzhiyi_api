@@ -124,7 +124,10 @@ router.post('/resetPwd', async ctx=>{
             message: '缺少参数: password'
         }
     } else {
-        await Account.updateOne({_id: mongoose.Types.ObjectId(data.id)}, { password: data.password }).then(() => {
+        let md5=crypto.createHash("md5");
+        await Account.updateOne({_id: mongoose.Types.ObjectId(data.id)}, {
+            password: md5.update(data.password).digest('hex')
+        }).then(() => {
             ctx.body = {
                 code: 200,
                 message: '修改密码成功'
